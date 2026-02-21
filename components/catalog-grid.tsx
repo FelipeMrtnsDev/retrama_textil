@@ -7,15 +7,57 @@ import { Search, Weight, ArrowRight, SlidersHorizontal } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { products, categories, type Product } from '@/lib/products'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  products,
+  categories,
+  type Product,
+  type Unit,
+  availableByUnit,
+  getUnitLabel,
+  pricePerUnit,
+} from '@/lib/products'
+import { useUnitPreference } from '@/hooks/use-unit-preference'
+
+const SEARCH_KEY = 'retrama_search_v1'
+const SEARCH_EVENT = 'retrama:search'
 
 export function CatalogGrid() {
+  const { unit, setUnit } = useUnitPreference()
   const [activeCategory, setActiveCategory] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState<'price-asc' | 'price-desc' | 'name'>(
     'name'
   )
   const gridRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const raw =
+      typeof window === 'undefined'
+        ? ''
+        : window.localStorage.getItem(SEARCH_KEY) || ''
+    if (raw) setSearchTerm(raw)
+  }, [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const handler = () => {
+      const next = window.localStorage.getItem(SEARCH_KEY) || ''
+      setSearchTerm((current) => (current === next ? current : next))
+    }
+    window.addEventListener('storage', handler)
+    window.addEventListener(SEARCH_EVENT, handler)
+    return () => {
+      window.removeEventListener('storage', handler)
+      window.removeEventListener(SEARCH_EVENT, handler)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    window.localStorage.setItem(SEARCH_KEY, searchTerm)
+    window.dispatchEvent(new Event(SEARCH_EVENT))
+  }, [searchTerm])
 
   const filtered = products
     .filter((p) => {
@@ -28,8 +70,10 @@ export function CatalogGrid() {
       return matchesCategory && matchesSearch
     })
     .sort((a, b) => {
-      if (sortBy === 'price-asc') return a.pricePerKg - b.pricePerKg
-      if (sortBy === 'price-desc') return b.pricePerKg - a.pricePerKg
+      if (sortBy === 'price-asc')
+        return pricePerUnit(a, unit) - pricePerUnit(b, unit)
+      if (sortBy === 'price-desc')
+        return pricePerUnit(b, unit) - pricePerUnit(a, unit)
       return a.name.localeCompare(b.name)
     })
 
@@ -76,16 +120,26 @@ export function CatalogGrid() {
           </div>
         </div>
 
+        <Tabs
+          value={unit}
+          onValueChange={(v) => setUnit(v as Unit)}
+          className="flex"
+        >
+          <TabsList>
+            <TabsTrigger value="m2">m²</TabsTrigger>
+            <TabsTrigger value="kg">kg</TabsTrigger>
+          </TabsList>
+        </Tabs>
+
         <div className="flex flex-wrap gap-2">
           {categories.map((cat) => (
             <button
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-                activeCategory === cat.id
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${activeCategory === cat.id
                   ? 'bg-primary text-primary-foreground'
                   : 'bg-card border border-border text-muted-foreground hover:text-foreground hover:border-primary/30'
-              }`}
+                }`}
             >
               {cat.label}
             </button>
@@ -99,7 +153,7 @@ export function CatalogGrid() {
 
       <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {filtered.map((product) => (
-          <ProductCard key={product.id} product={product} />
+          <ProductCard key={product.id} product={product} unit={unit} />
         ))}
       </div>
 
@@ -117,7 +171,7 @@ export function CatalogGrid() {
   )
 }
 
-function ProductCard({ product }: { product: Product }) {
+function ProductCard({ product, unit }: { product: Product; unit: Unit }) {
   return (
     <Link
       href={`/produto/${product.slug}`}
@@ -140,7 +194,8 @@ function ProductCard({ product }: { product: Product }) {
         <div className="absolute bottom-3 right-3">
           <span className="inline-flex items-center gap-1 text-xs bg-card/90 backdrop-blur-sm rounded-full px-2.5 py-1 text-foreground font-medium">
             <Weight className="w-3 h-3" />
-            {product.availableKg}kg disponivel
+            {availableByUnit(product, unit).toFixed(0)}
+            {getUnitLabel(unit)} disponivel
           </span>
         </div>
       </div>
@@ -164,9 +219,11 @@ function ProductCard({ product }: { product: Product }) {
         <div className="mt-auto pt-4 flex items-center justify-between">
           <div>
             <p className="text-xl font-bold text-foreground">
-              R$ {product.pricePerKg.toFixed(2)}
+              R$ {pricePerUnit(product, unit).toFixed(2)}
             </p>
-            <p className="text-xs text-muted-foreground">por quilo</p>
+            <p className="text-xs text-muted-foreground">
+              por {getUnitLabel(unit)}
+            </p>
           </div>
           <div className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center group-hover:scale-110 transition-transform">
             <ArrowRight className="w-4 h-4 text-secondary-foreground" />
