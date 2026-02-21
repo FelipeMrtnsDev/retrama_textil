@@ -1,4 +1,3 @@
-import { openai } from '@/lib/openai'
 import { generateText, Output } from 'ai'
 import { z } from 'zod'
 
@@ -18,7 +17,7 @@ export async function POST(req: Request) {
   const { fabricName, fabricDescription, fabricComposition, fabricColors } = await req.json()
 
   const { output } = await generateText({
-    model: openai('gpt-4o-mini'),
+    model: 'openai/gpt-4o-mini',
     output: Output.object({ schema: suggestionsSchema }),
     prompt: `Voce e um consultor criativo especializado em artesanato, costura e upcycling de tecidos reciclados.
 
