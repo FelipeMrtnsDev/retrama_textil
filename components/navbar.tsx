@@ -12,19 +12,19 @@ export function Navbar() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-lg border-b border-border">
       <nav className="mx-auto max-w-7xl flex items-center justify-between px-6 py-4">
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-3">
           <Image
             src="/images/logo-retrama.png"
-            alt="Retrama Amazonia"
-            width={40}
-            height={40}
-            className="w-10 h-10 object-contain"
+            alt="Reframa Amazonia"
+            width={56}
+            height={56}
+            className="w-14 h-14 object-contain"
           />
           <div className="flex flex-col leading-none">
-            <span className="text-lg font-bold tracking-tight text-foreground">
-              RETRAMA
+            <span className="text-2xl font-bold tracking-tight text-foreground">
+              REFRAMA
             </span>
-            <span className="text-[10px] font-medium tracking-[0.2em] text-muted-foreground uppercase">
+            <span className="text-[11px] font-medium tracking-[0.2em] text-muted-foreground uppercase">
               Amazonia
             </span>
           </div>

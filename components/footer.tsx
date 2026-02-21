@@ -10,14 +10,14 @@ export function Footer() {
             <Link href="/" className="flex items-center gap-2 mb-4">
               <Image
                 src="/images/logo-retrama.png"
-                alt="Retrama Amazonia"
+                alt="Reframa Amazonia"
                 width={36}
                 height={36}
                 className="w-9 h-9 object-contain brightness-0 invert"
               />
               <div className="flex flex-col leading-none">
                 <span className="text-lg font-bold text-primary-foreground">
-                  RETRAMA
+                  REFRAMA
                 </span>
                 <span className="text-[9px] font-medium tracking-[0.2em] text-primary-foreground/60 uppercase">
                   Amazonia
@@ -81,7 +81,7 @@ export function Footer() {
             </h4>
             <ul className="flex flex-col gap-3">
               <li className="text-sm text-primary-foreground/60">
-                contato@retrama.com.br
+                contato@reframa.com.br
               </li>
               <li className="text-sm text-primary-foreground/60">
                 (11) 99999-0000
@@ -95,7 +95,7 @@ export function Footer() {
 
         <div className="mt-12 pt-8 border-t border-primary-foreground/10 flex flex-col md:flex-row justify-between gap-4">
           <p className="text-xs text-primary-foreground/40">
-            2026 Retrama Amazonia. Todos os direitos reservados.
+            2026 Reframa Amazonia. Todos os direitos reservados.
           </p>
           <p className="text-xs text-primary-foreground/40">
             Feito com cuidado pelo planeta.

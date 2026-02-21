@@ -3,7 +3,7 @@ import { CatalogGrid } from '@/components/catalog-grid'
 import { Footer } from '@/components/footer'
 
 export const metadata = {
-  title: 'Catalogo | Retrama Amazonia',
+  title: 'Catalogo | Reframa Amazonia',
   description: 'Explore nosso catalogo de tecidos reciclados. Compre por quilo e crie sem limites.',
 }
 
