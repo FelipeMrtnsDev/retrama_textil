@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Menu, X, ShoppingBag, Search, Leaf } from 'lucide-react'
+import Image from 'next/image'
+import { Menu, X, ShoppingBag, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export function Navbar() {
@@ -12,12 +13,21 @@ export function Navbar() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-lg border-b border-border">
       <nav className="mx-auto max-w-7xl flex items-center justify-between px-6 py-4">
         <Link href="/" className="flex items-center gap-2">
-          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary">
-            <Leaf className="w-5 h-5 text-primary-foreground" />
+          <Image
+            src="/images/logo-retrama.png"
+            alt="Retrama Amazonia"
+            width={40}
+            height={40}
+            className="w-10 h-10 object-contain"
+          />
+          <div className="flex flex-col leading-none">
+            <span className="text-lg font-bold tracking-tight text-foreground">
+              RETRAMA
+            </span>
+            <span className="text-[10px] font-medium tracking-[0.2em] text-muted-foreground uppercase">
+              Amazonia
+            </span>
           </div>
-          <span className="text-xl font-bold tracking-tight text-foreground">
-            RetalhoVerde
-          </span>
         </Link>
 
         <div className="hidden md:flex items-center gap-8">

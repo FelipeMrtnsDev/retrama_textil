@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Leaf } from 'lucide-react'
+import Image from 'next/image'
 
 export function Footer() {
   return (
@@ -8,12 +8,21 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           <div className="md:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-secondary">
-                <Leaf className="w-4 h-4 text-secondary-foreground" />
+              <Image
+                src="/images/logo-retrama.png"
+                alt="Retrama Amazonia"
+                width={36}
+                height={36}
+                className="w-9 h-9 object-contain brightness-0 invert"
+              />
+              <div className="flex flex-col leading-none">
+                <span className="text-lg font-bold text-primary-foreground">
+                  RETRAMA
+                </span>
+                <span className="text-[9px] font-medium tracking-[0.2em] text-primary-foreground/60 uppercase">
+                  Amazonia
+                </span>
               </div>
-              <span className="text-lg font-bold text-primary-foreground">
-                RetalhoVerde
-              </span>
             </Link>
             <p className="text-sm text-primary-foreground/60 leading-relaxed">
               Transformando residuos texteis em materia-prima criativa e sustentavel.
@@ -72,7 +81,7 @@ export function Footer() {
             </h4>
             <ul className="flex flex-col gap-3">
               <li className="text-sm text-primary-foreground/60">
-                contato@retalhoverde.com.br
+                contato@retrama.com.br
               </li>
               <li className="text-sm text-primary-foreground/60">
                 (11) 99999-0000
@@ -86,7 +95,7 @@ export function Footer() {
 
         <div className="mt-12 pt-8 border-t border-primary-foreground/10 flex flex-col md:flex-row justify-between gap-4">
           <p className="text-xs text-primary-foreground/40">
-            2026 RetalhoVerde. Todos os direitos reservados.
+            2026 Retrama Amazonia. Todos os direitos reservados.
           </p>
           <p className="text-xs text-primary-foreground/40">
             Feito com cuidado pelo planeta.

@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const product = products.find((p) => p.slug === slug)
   if (!product) return { title: 'Produto nao encontrado' }
   return {
-    title: `${product.name} | RetalhoVerde`,
+    title: `${product.name} | Retrama Amazonia`,
     description: product.description,
   }
 }
