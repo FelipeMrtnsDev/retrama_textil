@@ -26,18 +26,15 @@ interface Suggestion {
 export function AIInspiration({ product }: { product: Product }) {
   const [suggestions, setSuggestions] = useState<Suggestion[]>([])
   const [loading, setLoading] = useState(false)
-  const [generatedImages, setGeneratedImages] = useState<
-    Record<number, string>
-  >({})
-  const [loadingImages, setLoadingImages] = useState<Record<number, boolean>>(
-    {}
-  )
+  const [generatedImages, setGeneratedImages] = useState<Record<number, string>>({})
+  const [loadingImages, setLoadingImages] = useState<Record<number, boolean>>({})
   const [expandedCard, setExpandedCard] = useState<number | null>(null)
   const [hasGenerated, setHasGenerated] = useState(false)
 
   async function handleGenerateSuggestions() {
     setLoading(true)
     setHasGenerated(true)
+
     try {
       const res = await fetch('/api/ai-suggestions', {
         method: 'POST',
@@ -49,39 +46,71 @@ export function AIInspiration({ product }: { product: Product }) {
           fabricColors: product.colors.join(', '),
         }),
       })
+
       const data = await res.json()
       setSuggestions(data.suggestions || [])
     } catch {
       setSuggestions([])
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   async function handleGenerateImage(index: number, prompt: string) {
     setLoadingImages((prev) => ({ ...prev, [index]: true }))
+
     try {
+      /**
+       * 1) Baixa a foto do tecido/produto exibida no card
+       * 2) Converte para File
+       * 3) Envia via FormData para /api/ai-image
+       */
+      const imageRes = await fetch(product.image)
+      if (!imageRes.ok) throw new Error('Falha ao baixar imagem do produto')
+
+      const blob = await imageRes.blob()
+      const extension =
+        blob.type === 'image/png'
+          ? 'png'
+          : blob.type === 'image/webp'
+            ? 'webp'
+            : 'jpg'
+
+      const file = new File([blob], `fabric.${extension}`, {
+        type: blob.type || 'image/jpeg',
+      })
+
+      const formData = new FormData()
+      formData.append('fabricImage', file)
+      formData.append('productPrompt', prompt)
+
       const res = await fetch('/api/ai-image', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt }),
+        body: formData,
       })
+
       const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data?.error || 'Erro ao gerar imagem')
+      }
+
       if (data.imageUrl) {
         setGeneratedImages((prev) => ({
           ...prev,
-          [index]: `data:image/png;base64,${data.imageUrl}`,
+          [index]: data.imageUrl, // ✅ já vem em data:image/png;base64,...
         }))
       }
-    } catch {
-      // silently fail
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoadingImages((prev) => ({ ...prev, [index]: false }))
     }
-    setLoadingImages((prev) => ({ ...prev, [index]: false }))
   }
 
   const difficultyColor = (d: string) => {
     if (d.toLowerCase().includes('facil')) return 'bg-green-100 text-green-800'
-    if (d.toLowerCase().includes('medio'))
-      return 'bg-yellow-100 text-yellow-800'
+    if (d.toLowerCase().includes('medio')) return 'bg-yellow-100 text-yellow-800'
     return 'bg-red-100 text-red-800'
   }
 
@@ -138,11 +167,11 @@ export function AIInspiration({ product }: { product: Product }) {
               className="rounded-xl border border-border bg-background p-5 transition-all duration-300 hover:border-primary/20 hover:shadow-md"
             >
               <div className="flex items-start justify-between gap-2 mb-2">
-                <h4 className="text-base font-bold text-foreground">
-                  {s.title}
-                </h4>
+                <h4 className="text-base font-bold text-foreground">{s.title}</h4>
                 <span
-                  className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full shrink-0 ${difficultyColor(s.difficulty)}`}
+                  className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full shrink-0 ${difficultyColor(
+                    s.difficulty
+                  )}`}
                 >
                   {s.difficulty}
                 </span>
@@ -191,15 +220,14 @@ export function AIInspiration({ product }: { product: Product }) {
                       width={400}
                       height={400}
                       className="w-full aspect-square object-cover"
+                      unoptimized
                     />
                   </div>
                 )}
               </div>
 
               <button
-                onClick={() =>
-                  setExpandedCard(expandedCard === i ? null : i)
-                }
+                onClick={() => setExpandedCard(expandedCard === i ? null : i)}
                 className="mt-3 flex items-center gap-1 text-xs text-primary font-medium hover:text-primary/80 transition-colors"
               >
                 {expandedCard === i ? (
@@ -224,9 +252,7 @@ export function AIInspiration({ product }: { product: Product }) {
                     {product.composition}
                   </p>
                   <p className="mt-1">
-                    <strong className="text-foreground">
-                      Cores disponiveis:
-                    </strong>{' '}
+                    <strong className="text-foreground">Cores disponiveis:</strong>{' '}
                     {product.colors.join(', ')}
                   </p>
                 </div>
