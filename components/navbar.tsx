@@ -44,16 +44,16 @@ export function Navbar() {
             Catalogo
           </Link>
           <Link
-            href="#como-funciona"
+            href="/#como-funciona"
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             Como Funciona
           </Link>
           <Link
-            href="#sobre"
+            href="/quem-somos"
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
-            Sobre
+            Quem Somos
           </Link>
         </div>
 
@@ -105,11 +105,11 @@ export function Navbar() {
               Como Funciona
             </Link>
             <Link
-              href="#sobre"
+              href="/quem-somos"
               className="text-sm font-medium text-foreground py-2"
               onClick={() => setIsOpen(false)}
             >
-              Sobre
+              Quem Somos
             </Link>
             <div className="flex items-center gap-3 pt-2 border-t border-border">
               <Button variant="ghost" size="icon" aria-label="Buscar">
