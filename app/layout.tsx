@@ -7,7 +7,7 @@ const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm-sans' })
 const spaceMono = Space_Mono({ weight: ['400', '700'], subsets: ['latin'], variable: '--font-space-mono' })
 
 export const metadata: Metadata = {
-  title: 'Reframa Amazonia | Marketplace de Tecidos Reciclados',
+  title: 'Retrama Amazonia | Marketplace de Tecidos Reciclados',
   description: 'Marketplace de tecidos reciclados de fardas industriais e fantasias carnavalescas. Compre tecidos por quilo para artesanato, costura e pequenos negocios.',
   generator: 'v0.app',
   icons: {

@@ -15,14 +15,14 @@ export function Navbar() {
         <Link href="/" className="flex items-center gap-3">
           <Image
             src="/images/logo-retrama.png"
-            alt="Reframa Amazonia"
+            alt="Retrama Amazonia"
             width={56}
             height={56}
             className="w-14 h-14 object-contain"
           />
           <div className="flex flex-col leading-none">
             <span className="text-2xl font-bold tracking-tight text-foreground">
-              REFRAMA
+              RETRAMA
             </span>
             <span className="text-[11px] font-medium tracking-[0.2em] text-muted-foreground uppercase">
               Amazonia
