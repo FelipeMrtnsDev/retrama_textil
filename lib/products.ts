@@ -6,12 +6,49 @@ export interface Product {
   origin: string
   category: string
   pricePerKg: number
+  gsm: number
   minKg: number
   availableKg: number
   image: string
   colors: string[]
   composition: string
   tags: string[]
+}
+
+export type Unit = 'm2' | 'kg'
+
+export function getUnitLabel(unit: Unit) {
+  return unit === 'm2' ? 'm²' : 'kg'
+}
+
+export function kgPerM2(product: Product) {
+  return product.gsm / 1000
+}
+
+export function pricePerUnit(product: Product, unit: Unit) {
+  if (unit === 'kg') return product.pricePerKg
+  return product.pricePerKg * kgPerM2(product)
+}
+
+export function availableByUnit(product: Product, unit: Unit) {
+  if (unit === 'kg') return product.availableKg
+  return product.availableKg / kgPerM2(product)
+}
+
+export function minByUnit(product: Product, unit: Unit) {
+  if (unit === 'kg') return product.minKg
+  return product.minKg / kgPerM2(product)
+}
+
+export function convertQuantity(
+  product: Product,
+  quantity: number,
+  fromUnit: Unit,
+  toUnit: Unit,
+) {
+  if (fromUnit === toUnit) return quantity
+  if (fromUnit === 'kg' && toUnit === 'm2') return quantity / kgPerM2(product)
+  return quantity * kgPerM2(product)
 }
 
 export const categories = [
@@ -32,6 +69,7 @@ export const products: Product[] = [
     origin: 'Fardas Industriais',
     category: 'industrial',
     pricePerKg: 18.9,
+    gsm: 220,
     minKg: 1,
     availableKg: 250,
     image: '/images/algodao-industrial.jpg',
@@ -48,6 +86,7 @@ export const products: Product[] = [
     origin: 'Fantasias de Carnaval',
     category: 'carnaval',
     pricePerKg: 32.5,
+    gsm: 260,
     minKg: 0.5,
     availableKg: 80,
     image: '/images/paete-carnaval.jpg',
@@ -64,6 +103,7 @@ export const products: Product[] = [
     origin: 'Uniformes Industriais',
     category: 'jeans',
     pricePerKg: 22.0,
+    gsm: 380,
     minKg: 1,
     availableKg: 180,
     image: '/images/jeans-reciclado.jpg',
@@ -80,6 +120,7 @@ export const products: Product[] = [
     origin: 'Fantasias e Eventos',
     category: 'carnaval',
     pricePerKg: 28.0,
+    gsm: 240,
     minKg: 0.5,
     availableKg: 120,
     image: '/images/lycra-colorida.jpg',
@@ -96,6 +137,7 @@ export const products: Product[] = [
     origin: 'Uniformes Corporativos',
     category: 'industrial',
     pricePerKg: 15.5,
+    gsm: 170,
     minKg: 1,
     availableKg: 300,
     image: '/images/poliester-uniforme.jpg',
@@ -112,6 +154,7 @@ export const products: Product[] = [
     origin: 'Fantasias de Eventos',
     category: 'eventos',
     pricePerKg: 25.0,
+    gsm: 55,
     minKg: 0.5,
     availableKg: 60,
     image: '/images/tule-fantasia.jpg',
@@ -128,6 +171,7 @@ export const products: Product[] = [
     origin: 'Decoracao de Eventos',
     category: 'eventos',
     pricePerKg: 27.0,
+    gsm: 130,
     minKg: 0.5,
     availableKg: 90,
     image: '/images/cetim-evento.jpg',
@@ -144,6 +188,7 @@ export const products: Product[] = [
     origin: 'Diversas Origens',
     category: 'industrial',
     pricePerKg: 12.0,
+    gsm: 190,
     minKg: 2,
     availableKg: 500,
     image: '/images/hero-textiles.jpg',

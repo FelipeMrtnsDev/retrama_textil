@@ -24,9 +24,9 @@ const steps = [
   },
   {
     icon: ShoppingBag,
-    title: 'Venda por Quilo',
+    title: 'Venda por m²',
     description:
-      'Voce compra a quantidade que precisa, pagando por quilo. Simples, economico e sustentavel.',
+      'Voce compra a quantidade que precisa por metro quadrado, com opcao de comprar por quilo.',
   },
 ]
 

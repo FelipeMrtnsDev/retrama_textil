@@ -8,7 +8,6 @@ import {
   ShoppingBag,
   Minus,
   Plus,
-  Weight,
   Tag,
   Layers,
   Palette,
@@ -18,13 +17,27 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { AIInspiration } from '@/components/ai-inspiration'
-import type { Product } from '@/lib/products'
+import {
+  availableByUnit,
+  convertQuantity,
+  getUnitLabel,
+  minByUnit,
+  pricePerUnit,
+  type Product,
+  type Unit,
+} from '@/lib/products'
+import { useUnitPreference } from '@/hooks/use-unit-preference'
+import { useCart } from '@/hooks/use-cart'
 
 export function ProductDetail({ product }: { product: Product }) {
-  const [quantity, setQuantity] = useState(product.minKg)
+  const { unit, setUnit } = useUnitPreference()
+  const { addItem } = useCart()
+  const [quantity, setQuantity] = useState(() => minByUnit(product, unit))
   const [addedToCart, setAddedToCart] = useState(false)
   const detailRef = useRef<HTMLDivElement>(null)
+  const prevUnitRef = useRef<Unit>(unit)
 
   useEffect(() => {
     const el = detailRef.current
@@ -42,10 +55,28 @@ export function ProductDetail({ product }: { product: Product }) {
     })
   }, [])
 
+  useEffect(() => {
+    const prev = prevUnitRef.current
+    if (prev === unit) return
+    prevUnitRef.current = unit
+    setQuantity((current) => {
+      const next = convertQuantity(product, current, prev, unit)
+      const min = minByUnit(product, unit)
+      const max = availableByUnit(product, unit)
+      return Math.min(max, Math.max(min, next))
+    })
+  }, [product, unit])
+
   function handleAddToCart() {
+    addItem(product.id, unit, quantity)
     setAddedToCart(true)
     setTimeout(() => setAddedToCart(false), 2000)
   }
+
+  const min = minByUnit(product, unit)
+  const available = availableByUnit(product, unit)
+  const step = 0.5
+  const otherUnit: Unit = unit === 'kg' ? 'm2' : 'kg'
 
   return (
     <div ref={detailRef} className="mx-auto max-w-7xl">
@@ -94,16 +125,28 @@ export function ProductDetail({ product }: { product: Product }) {
           <div data-fade className="mt-4">
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-bold text-foreground">
-                R$ {product.pricePerKg.toFixed(2)}
+                R$ {pricePerUnit(product, unit).toFixed(2)}
               </span>
-              <span className="text-sm text-muted-foreground flex items-center gap-1">
-                <Weight className="w-3.5 h-3.5" />
-                por quilo
+              <span className="text-sm text-muted-foreground">
+                por {getUnitLabel(unit)}
               </span>
             </div>
+            <p className="mt-1 text-sm text-muted-foreground">
+              ou R$ {pricePerUnit(product, otherUnit).toFixed(2)} por{' '}
+              {getUnitLabel(otherUnit)}
+            </p>
           </div>
 
           <Separator className="my-6" />
+
+          <div data-fade className="flex">
+            <Tabs value={unit} onValueChange={(v) => setUnit(v as Unit)}>
+              <TabsList>
+                <TabsTrigger value="m2">m²</TabsTrigger>
+                <TabsTrigger value="kg">kg</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
 
           <div data-fade>
             <p className="text-muted-foreground leading-relaxed">
@@ -135,7 +178,7 @@ export function ProductDetail({ product }: { product: Product }) {
               <div>
                 <p className="text-xs text-muted-foreground">Disponivel</p>
                 <p className="text-sm font-medium text-foreground">
-                  {product.availableKg} kg em estoque
+                  {available.toFixed(0)} {getUnitLabel(unit)} em estoque
                 </p>
               </div>
             </div>
@@ -144,7 +187,7 @@ export function ProductDetail({ product }: { product: Product }) {
               <div>
                 <p className="text-xs text-muted-foreground">Minimo</p>
                 <p className="text-sm font-medium text-foreground">
-                  {product.minKg} kg
+                  {min.toFixed(1)} {getUnitLabel(unit)}
                 </p>
               </div>
             </div>
@@ -154,11 +197,13 @@ export function ProductDetail({ product }: { product: Product }) {
 
           <div data-fade className="flex flex-col gap-4">
             <div className="flex items-center gap-4">
-              <p className="text-sm font-medium text-foreground">Quantidade (kg):</p>
+              <p className="text-sm font-medium text-foreground">
+                Quantidade ({getUnitLabel(unit)}):
+              </p>
               <div className="flex items-center border border-border rounded-lg overflow-hidden">
                 <button
                   onClick={() =>
-                    setQuantity(Math.max(product.minKg, quantity - 0.5))
+                    setQuantity(Math.max(min, quantity - step))
                   }
                   className="w-10 h-10 flex items-center justify-center text-foreground hover:bg-muted transition-colors"
                   aria-label="Diminuir quantidade"
@@ -170,7 +215,7 @@ export function ProductDetail({ product }: { product: Product }) {
                 </span>
                 <button
                   onClick={() =>
-                    setQuantity(Math.min(product.availableKg, quantity + 0.5))
+                    setQuantity(Math.min(available, quantity + step))
                   }
                   className="w-10 h-10 flex items-center justify-center text-foreground hover:bg-muted transition-colors"
                   aria-label="Aumentar quantidade"
@@ -183,17 +228,16 @@ export function ProductDetail({ product }: { product: Product }) {
             <div className="flex items-center justify-between p-4 rounded-xl bg-primary/5">
               <span className="text-sm text-muted-foreground">Total estimado:</span>
               <span className="text-2xl font-bold text-foreground">
-                R$ {(product.pricePerKg * quantity).toFixed(2)}
+                R$ {(pricePerUnit(product, unit) * quantity).toFixed(2)}
               </span>
             </div>
 
             <Button
               size="lg"
-              className={`h-12 gap-2 text-base transition-all duration-300 ${
-                addedToCart
+              className={`h-12 gap-2 text-base transition-all duration-300 ${addedToCart
                   ? 'bg-green-600 text-white hover:bg-green-600'
                   : 'bg-primary text-primary-foreground hover:bg-primary/90'
-              }`}
+                }`}
               onClick={handleAddToCart}
             >
               {addedToCart ? (

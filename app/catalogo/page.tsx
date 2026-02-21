@@ -4,7 +4,8 @@ import { Footer } from '@/components/footer'
 
 export const metadata = {
   title: 'Catalogo | RETRAMA Amazonia',
-  description: 'Explore nosso catalogo de tecidos reciclados. Compre por quilo e crie sem limites.',
+  description:
+    'Explore nosso catalogo de tecidos reciclados. Compre por m² e, se preferir, por kg.',
 }
 
 export default function CatalogoPage() {
@@ -21,7 +22,8 @@ export default function CatalogoPage() {
               Catalogo de Tecidos
             </h1>
             <p className="mt-4 text-lg text-muted-foreground max-w-xl">
-              Todos os tecidos sao vendidos por quilo. Escolha, compre e transforme.
+              Todos os tecidos sao vendidos por m², com opcao de compra por kg.
+              Escolha, compre e transforme.
             </p>
           </div>
           <CatalogGrid />
